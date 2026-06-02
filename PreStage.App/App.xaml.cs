@@ -12,7 +12,7 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             Debug.WriteLine($"Unhandled exception: {args.Exception}");
-            args.Handled = true;
+            args.Handled = false;
         };
     }
 }

@@ -15,14 +15,42 @@
             <SolidColorBrush x:Key="ItemHover" Color="#2A2D2E"/>
             <SolidColorBrush x:Key="ItemSelected" Color="#094771"/>
             <SolidColorBrush x:Key="GridItemBackground" Color="#2A2A2A"/>
+            <SolidColorBrush x:Key="ControlBackground" Color="#363636"/>
+            <SolidColorBrush x:Key="ControlBackgroundHover" Color="#444444"/>
             <SolidColorBrush x:Key="InputBackground" Color="#3C3C3C"/>
             <SolidColorBrush x:Key="DangerBrush" Color="#F44336"/>
             <SolidColorBrush x:Key="SuccessBrush" Color="#4CAF50"/>
             <SolidColorBrush x:Key="WarningBrush" Color="#FFC107"/>
+            <SolidColorBrush x:Key="ScrollThumb" Color="#5A5A5A"/>
+            <SolidColorBrush x:Key="ScrollThumbHover" Color="#737373"/>
 
             <Style TargetType="Window" x:Key="MainWindowStyle">
                 <Setter Property="Background" Value="{StaticResource AppBackground}"/>
                 <Setter Property="Foreground" Value="{StaticResource ForegroundPrimary}"/>
+            </Style>
+
+            <Style TargetType="Border" x:Key="ScopePanelBorder">
+                <Setter Property="Background" Value="#D8202020"/>
+                <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="CornerRadius" Value="5"/>
+            </Style>
+
+            <Style TargetType="Grid" x:Key="MetadataGrid">
+                <Setter Property="Margin" Value="0"/>
+            </Style>
+
+            <Style TargetType="TextBlock" x:Key="MetadataLabel">
+                <Setter Property="Foreground" Value="{StaticResource ForegroundSecondary}"/>
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="Margin" Value="0,2,8,2"/>
+            </Style>
+
+            <Style TargetType="TextBlock" x:Key="MetadataValue">
+                <Setter Property="Foreground" Value="{StaticResource ForegroundPrimary}"/>
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                <Setter Property="Margin" Value="0,2,0,2"/>
             </Style>
 
             <Style TargetType="Button" x:Key="ToolbarButton">
@@ -49,6 +77,14 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Style>
+
+            <Style TargetType="Button" x:Key="ScopeChipButton" BasedOn="{StaticResource ToolbarButton}">
+                <Setter Property="FontSize" Value="8"/>
+                <Setter Property="Height" Value="18"/>
+                <Setter Property="MinWidth" Value="28"/>
+                <Setter Property="Padding" Value="5,1"/>
+                <Setter Property="Margin" Value="0,0,3,0"/>
             </Style>
 
             <Style TargetType="Button" x:Key="IconButton">

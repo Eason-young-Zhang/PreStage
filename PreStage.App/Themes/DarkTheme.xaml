@@ -12,6 +12,10 @@
     <SolidColorBrush x:Key="ItemHover" Color="#2A2D2E"/>
     <SolidColorBrush x:Key="ItemSelected" Color="#094771"/>
     <SolidColorBrush x:Key="GridItemBackground" Color="#2A2A2A"/>
+    <SolidColorBrush x:Key="ControlBackground" Color="#363636"/>
+    <SolidColorBrush x:Key="ControlBackgroundHover" Color="#444444"/>
+    <SolidColorBrush x:Key="ScrollThumb" Color="#5A5A5A"/>
+    <SolidColorBrush x:Key="ScrollThumbHover" Color="#737373"/>
 
     <Style TargetType="Window" x:Key="MainWindowStyle">
         <Setter Property="Background" Value="{StaticResource AppBackground}"/>
@@ -19,9 +23,10 @@
     </Style>
 
     <Style TargetType="Button" x:Key="ToolbarButton">
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Background" Value="{StaticResource ControlBackground}"/>
         <Setter Property="Foreground" Value="{StaticResource ForegroundPrimary}"/>
-        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="8,4"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="Cursor" Value="Hand"/>
@@ -29,17 +34,94 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="4" Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#3E3E3E"/>
+                            <Setter Property="Background" Value="{StaticResource ControlBackgroundHover}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style TargetType="Thumb" x:Key="DarkScrollThumb">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Border x:Name="ThumbBorder" Background="{StaticResource ScrollThumb}" CornerRadius="4" Margin="2"/>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ThumbBorder" Property="Background" Value="{StaticResource ScrollThumbHover}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ScrollBar">
+        <Setter Property="Background" Value="#242424"/>
+        <Setter Property="Width" Value="10"/>
+        <Setter Property="Height" Value="10"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton IsEnabled="False" Opacity="0" Focusable="False"/>
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton IsEnabled="False" Opacity="0" Focusable="False"/>
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource DarkScrollThumb}"/>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="Border" x:Key="ScopePanelBorder">
+        <Setter Property="Background" Value="#D8202020"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="5"/>
+    </Style>
+
+    <Style TargetType="Button" x:Key="ScopeChipButton" BasedOn="{StaticResource ToolbarButton}">
+        <Setter Property="FontSize" Value="8"/>
+        <Setter Property="Height" Value="18"/>
+        <Setter Property="MinWidth" Value="28"/>
+        <Setter Property="Padding" Value="5,1"/>
+        <Setter Property="Margin" Value="0,0,3,0"/>
+    </Style>
+
+    <Style TargetType="Grid" x:Key="MetadataGrid">
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+
+    <Style TargetType="TextBlock" x:Key="MetadataLabel">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundSecondary}"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="Margin" Value="0,2,8,2"/>
+    </Style>
+
+    <Style TargetType="TextBlock" x:Key="MetadataValue">
+        <Setter Property="Foreground" Value="{StaticResource ForegroundPrimary}"/>
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        <Setter Property="Margin" Value="0,2,0,2"/>
     </Style>
 
     <Style TargetType="Button" x:Key="IconButton">

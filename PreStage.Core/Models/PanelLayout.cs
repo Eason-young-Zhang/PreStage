@@ -46,6 +46,7 @@ public sealed class PanelLayout
     public AppAppearanceMode AppAppearance { get; set; } = AppAppearanceMode.System;
     public PreviewBackgroundTone PreviewBackground { get; set; } = PreviewBackgroundTone.System;
     public ReviewMatteSize ReviewMatteSize { get; set; } = ReviewMatteSize.None;
+    public ToolbarDisplayMode ToolbarDisplayMode { get; set; } = ToolbarDisplayMode.IconOnly;
 
     public double? ActiveCropGuideAspectRatio(MediaItem item)
     {

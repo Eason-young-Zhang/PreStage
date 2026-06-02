@@ -8,7 +8,7 @@ Language: English | [简体中文](BUILD_AND_RELEASE.zh-CN.md)
 # Restore
 dotnet restore PreStage.slnx
 
-# Test (currently 54 tests)
+# Test (currently 56 tests)
 dotnet test PreStage.Tests\PreStage.Tests.csproj -v minimal -m:1 -nr:false
 
 # Build

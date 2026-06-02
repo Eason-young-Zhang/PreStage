@@ -47,7 +47,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button ToolTip="Copy selected files to target" Command="{Binding StartCopyCommand}" Height="30" FontSize="12" Padding="8,4">
+                    <Button ToolTip="{Binding Text[Copy]}" Command="{Binding StartCopyCommand}" Height="30" FontSize="12" Padding="8,4">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource ToolbarButton}">
                                 <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
@@ -59,7 +59,7 @@
                                         <Setter Property="Background" Value="{StaticResource AccentHover}"/>
                                     </Trigger>
                                     <DataTrigger Binding="{Binding ToolbarDisplayMode}" Value="TextOnly">
-                                        <Setter Property="Content" Value="Copy"/>
+                                        <Setter Property="Content" Value="{Binding Text[Copy]}"/>
                                         <Setter Property="Width" Value="Auto"/>
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding ToolbarDisplayMode}" Value="Both">
@@ -70,7 +70,7 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button ToolTip="Copy Settings" Command="{Binding ToggleCopySettingsCommand}" Height="30" FontSize="12" Padding="8,4">
+                    <Button ToolTip="{Binding Text[Copy Settings]}" Command="{Binding ToggleCopySettingsCommand}" Height="30" FontSize="12" Padding="8,4">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource ToolbarButton}">
                                 <Setter Property="Content" Value="⚙"/>
@@ -88,33 +88,38 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button ToolTip="Share/Export" Command="{Binding ShareItemsCommand}" Height="30" FontSize="12" Padding="8,4">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource ToolbarButton}">
-                                <Setter Property="Content" Value="↗"/>
-                                <Setter Property="Width" Value="32"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ToolbarDisplayMode}" Value="TextOnly">
-                                        <Setter Property="Content" Value="Export"/>
-                                        <Setter Property="Width" Value="Auto"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding ToolbarDisplayMode}" Value="Both">
-                                        <Setter Property="Content" Value="↗ Export"/>
-                                        <Setter Property="Width" Value="Auto"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
                 </StackPanel>
 
                 <Button x:Name="MoreButton" Grid.Column="1" Style="{StaticResource IconButton}" Content="…" ToolTip="More" Width="32" Height="30" FontSize="14" VerticalAlignment="Center" Margin="4,0,0,0" Click="MoreButton_Click">
                     <Button.ContextMenu>
                         <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                            <MenuItem Header="Open" Command="{Binding OpenItemsCommand}"/>
-                            <MenuItem Header="Reveal in Explorer" Command="{Binding RevealInExplorerCommand}"/>
+                            <MenuItem Header="{Binding Text[Open]}" Command="{Binding OpenItemsCommand}"/>
+                            <MenuItem Header="{Binding Text[Reveal in Explorer]}" Command="{Binding RevealInExplorerCommand}"/>
+                            <MenuItem Header="{Binding Text[Export via Explorer]}" Command="{Binding ShareItemsCommand}"/>
                             <Separator/>
-                            <MenuItem Header="Copy Log" Command="{Binding ToggleCopyLogCommand}"/>
+                            <MenuItem Header="{Binding Text[Toolbar]}">
+                                <MenuItem Header="Icons Only" Command="{Binding SetToolbarDisplayModeCommand}" CommandParameter="IconOnly"/>
+                                <MenuItem Header="Text Only" Command="{Binding SetToolbarDisplayModeCommand}" CommandParameter="TextOnly"/>
+                                <MenuItem Header="Icons + Text" Command="{Binding SetToolbarDisplayModeCommand}" CommandParameter="Both"/>
+                            </MenuItem>
+                            <MenuItem Header="{Binding Text[Language]}">
+                                <MenuItem Header="System" Command="{Binding SetAppLanguageCommand}" CommandParameter="System"/>
+                                <MenuItem Header="English" Command="{Binding SetAppLanguageCommand}" CommandParameter="English"/>
+                                <MenuItem Header="简体中文" Command="{Binding SetAppLanguageCommand}" CommandParameter="Chinese"/>
+                                <MenuItem Header="Deutsch" Command="{Binding SetAppLanguageCommand}" CommandParameter="German"/>
+                            </MenuItem>
+                            <MenuItem Header="{Binding Text[Scopes]}">
+                                <MenuItem Header="Histogram Floating" Command="{Binding SetHistogramPlacementCommand}" CommandParameter="Floating"/>
+                                <MenuItem Header="Histogram in Inspector" Command="{Binding SetHistogramPlacementCommand}" CommandParameter="Inspector"/>
+                                <MenuItem Header="Hide Histogram" Command="{Binding SetHistogramPlacementCommand}" CommandParameter="Hidden"/>
+                                <Separator/>
+                                <MenuItem Header="Waveform Floating" Command="{Binding SetWaveformPlacementCommand}" CommandParameter="Floating"/>
+                                <MenuItem Header="Waveform in Inspector" Command="{Binding SetWaveformPlacementCommand}" CommandParameter="Inspector"/>
+                                <MenuItem Header="Hide Waveform" Command="{Binding SetWaveformPlacementCommand}" CommandParameter="Hidden"/>
+                            </MenuItem>
+                            <MenuItem Header="{Binding ActivePreset.Name, StringFormat='Workspace: {0}'}" IsEnabled="False"/>
+                            <Separator/>
+                            <MenuItem Header="{Binding Text[Copy Log]}" Command="{Binding ToggleCopyLogCommand}"/>
                         </ContextMenu>
                     </Button.ContextMenu>
                 </Button>
@@ -128,13 +133,18 @@
                 <ColumnDefinition Width="240" MinWidth="200" MaxWidth="400"/>
                 <ColumnDefinition Width="4"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition Width="280" MinWidth="220" MaxWidth="420"/>
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Background="{StaticResource ToolbarBackground}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel Margin="0,8,0,8">
 
-                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="CAMERA CARD" Margin="12,0,0,4"/>
+                        <DockPanel Margin="12,0,12,4">
+                            <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="{Binding Text[Camera Card]}" Margin="0" VerticalAlignment="Center"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="↻" ToolTip="{Binding Text[Refresh Devices]}" Width="24" Height="22" Command="{Binding RefreshCameraCardsCommand}"/>
+                        </DockPanel>
                         <ItemsControl ItemsSource="{Binding DetectedCards}" Margin="12,4,12,6">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type services:CameraCardInfo}">
@@ -155,7 +165,7 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        <TextBlock Text="On Insert" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="12,0,0,2"/>
+                        <TextBlock Text="{Binding Text[On Insert]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="12,0,0,2"/>
                         <ComboBox Style="{StaticResource DarkComboBox}" Width="160" HorizontalAlignment="Left" Margin="12,0,12,8" SelectedValue="{Binding CameraCardAction}" SelectedValuePath="Tag">
                             <ComboBoxItem Content="Notify Only" Tag="{x:Static models:CameraCardAction.Notify}"/>
                             <ComboBoxItem Content="Off" Tag="{x:Static models:CameraCardAction.Off}"/>
@@ -163,12 +173,25 @@
                             <ComboBoxItem Content="Select and Scan" Tag="{x:Static models:CameraCardAction.SelectAndScan}"/>
                         </ComboBox>
 
-                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="SOURCE"/>
+                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="{Binding Text[Source]}"/>
                         <StackPanel Margin="12,4,12,6">
-                            <Button Style="{StaticResource ToolbarButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="Choose Folder..." Command="{Binding SelectSourceFolderCommand}"/>
-                            <TextBlock Text="{Binding SourcePath}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" TextTrimming="CharacterEllipsis" Margin="0,4,0,0" ToolTip="{Binding SourcePath}"/>
-                            <CheckBox Style="{StaticResource DarkCheckBox}" Margin="0,4,0,0" IsChecked="{Binding IncludeSubfolders}" Content="Include subfolders"/>
-                            <TreeView ItemsSource="{Binding SourceFolderTree}" Background="Transparent" BorderThickness="0" MaxHeight="160" Margin="0,4,0,0">
+                            <Button Style="{StaticResource ToolbarButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Command="{Binding SelectSourceFolderCommand}" ToolTip="{Binding SourcePathSummary}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="📁" Margin="0,0,8,0"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding SourceFolderName}" Foreground="{StaticResource ForegroundPrimary}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding SourcePathSummary}" Foreground="{StaticResource ForegroundSecondary}" FontSize="9" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding SourceSelectionSummary}" Foreground="{StaticResource AccentBrush}" FontSize="9" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                            <CheckBox Style="{StaticResource DarkCheckBox}" Margin="0,4,0,0" IsChecked="{Binding IncludeSubfolders}" Content="{Binding Text[Include subfolders]}"/>
+                            <Border Background="{StaticResource GridItemBackground}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="6" Margin="0,5,0,0">
+                            <TreeView ItemsSource="{Binding SourceFolderTree}" Background="Transparent" BorderThickness="0" MaxHeight="92" Margin="0">
                                 <TreeView.ItemContainerStyle>
                                     <Style TargetType="TreeViewItem">
                                         <Setter Property="Foreground" Value="{StaticResource ForegroundSecondary}"/>
@@ -188,13 +211,27 @@
                                     </HierarchicalDataTemplate>
                                 </TreeView.ItemTemplate>
                             </TreeView>
+                            </Border>
                         </StackPanel>
 
-                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="TARGET"/>
+                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="{Binding Text[Target]}"/>
                         <StackPanel Margin="12,4,12,6">
-                            <Button Style="{StaticResource ToolbarButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="Choose Folder..." Command="{Binding SelectTargetFolderCommand}"/>
-                            <TextBlock Text="{Binding TargetPath}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" TextTrimming="CharacterEllipsis" Margin="0,4,0,0" ToolTip="{Binding TargetPath}"/>
-                            <TreeView ItemsSource="{Binding TargetFolderTree}" Background="Transparent" BorderThickness="0" MaxHeight="160" Margin="0,4,0,0">
+                            <Button Style="{StaticResource ToolbarButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Command="{Binding SelectTargetFolderCommand}" ToolTip="{Binding TargetPathSummary}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="⇩" Margin="0,0,8,0"/>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding TargetFolderName}" Foreground="{StaticResource ForegroundPrimary}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding TargetPathSummary}" Foreground="{StaticResource ForegroundSecondary}" FontSize="9" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding TargetSelectionSummary}" Foreground="{StaticResource AccentBrush}" FontSize="9" TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                            <Border Background="{StaticResource GridItemBackground}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="6" Margin="0,5,0,0">
+                            <TreeView ItemsSource="{Binding TargetFolderTree}" Background="Transparent" BorderThickness="0" MaxHeight="92" Margin="0">
                                 <TreeView.ItemContainerStyle>
                                     <Style TargetType="TreeViewItem">
                                         <Setter Property="Foreground" Value="{StaticResource ForegroundSecondary}"/>
@@ -214,38 +251,39 @@
                                     </HierarchicalDataTemplate>
                                 </TreeView.ItemTemplate>
                             </TreeView>
+                            </Border>
                         </StackPanel>
 
                         <StackPanel Margin="12,4,12,6" Visibility="{Binding ShowCopySettings, Converter={StaticResource BoolToVisibility}}">
-                            <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="COPY" Margin="0,0,0,4"/>
-                            <TextBlock Text="Organization" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,0,0,2"/>
+                            <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="{Binding Text[Copy]}" Margin="0,0,0,4"/>
+                            <TextBlock Text="{Binding Text[Organization]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,0,0,2"/>
                             <ComboBox Style="{StaticResource DarkComboBox}" Width="160" HorizontalAlignment="Left" SelectedIndex="0" SelectedValue="{Binding CopyRule}" SelectedValuePath="Tag">
                                 <ComboBoxItem Content="Capture Date" Tag="{x:Static models:CopyOrganizationRule.CaptureDate}"/>
                                 <ComboBoxItem Content="Preserve Structure" Tag="{x:Static models:CopyOrganizationRule.PreserveStructure}"/>
                                 <ComboBoxItem Content="Camera Model" Tag="{x:Static models:CopyOrganizationRule.CameraModel}"/>
                                 <ComboBoxItem Content="Rating" Tag="{x:Static models:CopyOrganizationRule.Rating}"/>
                             </ComboBox>
-                            <TextBlock Text="Conflict" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,4,0,2"/>
+                            <TextBlock Text="{Binding Text[Conflict]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,4,0,2"/>
                             <ComboBox Style="{StaticResource DarkComboBox}" Width="160" HorizontalAlignment="Left" SelectedIndex="0" SelectedValue="{Binding CopyConflictPolicy}" SelectedValuePath="Tag">
                                 <ComboBoxItem Content="Auto Rename" Tag="{x:Static models:CopyConflictPolicy.AutoRename}"/>
                                 <ComboBoxItem Content="Skip" Tag="{x:Static models:CopyConflictPolicy.SkipExisting}"/>
                                 <ComboBoxItem Content="Overwrite" Tag="{x:Static models:CopyConflictPolicy.Overwrite}"/>
                             </ComboBox>
-                            <TextBlock Text="Content" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,4,0,2"/>
+                            <TextBlock Text="{Binding Text[Content]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,4,0,2"/>
                             <ComboBox Style="{StaticResource DarkComboBox}" Width="160" HorizontalAlignment="Left" SelectedValue="{Binding CopyContentMode}" SelectedValuePath="Tag">
                                 <ComboBoxItem Content="All Supported" Tag="{x:Static models:CopyContentMode.AllSupported}"/>
                                 <ComboBoxItem Content="RAW Only" Tag="{x:Static models:CopyContentMode.RawOnly}"/>
                             </ComboBox>
-                            <TextBlock Text="Verification" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,4,0,2"/>
+                            <TextBlock Text="{Binding Text[Verification]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,4,0,2"/>
                             <ComboBox Style="{StaticResource DarkComboBox}" Width="160" HorizontalAlignment="Left" SelectedValue="{Binding CopyVerificationMode}" SelectedValuePath="Tag">
                                 <ComboBoxItem Content="Size Only" Tag="{x:Static models:CopyVerificationMode.SizeOnly}"/>
                                 <ComboBoxItem Content="SHA-256 Hash" Tag="{x:Static models:CopyVerificationMode.Sha256}"/>
                             </ComboBox>
                         </StackPanel>
 
-                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="FILTER"/>
+                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="{Binding Text[Filter]}"/>
                         <StackPanel Margin="12,4,12,6">
-                            <TextBlock Text="Min Rating" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,0,0,2"/>
+                            <TextBlock Text="{Binding Text[Min Rating]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,0,0,2"/>
                             <ComboBox Style="{StaticResource DarkComboBox}" Width="120" HorizontalAlignment="Left" SelectedIndex="{Binding MinimumRating, Mode=TwoWay}">
                                 <ComboBoxItem Content="Any"/>
                                 <ComboBoxItem Content="★+"/>
@@ -254,8 +292,8 @@
                                 <ComboBoxItem Content="★★★★+"/>
                                 <ComboBoxItem Content="★★★★★"/>
                             </ComboBox>
-                            <CheckBox Style="{StaticResource DarkCheckBox}" Margin="0,6,0,0" IsChecked="{Binding IsStackExpanded}" Content="Show paired RAW+JPEG"/>
-                            <TextBlock Text="Color Label" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,8,0,2"/>
+                            <CheckBox Style="{StaticResource DarkCheckBox}" Margin="0,6,0,0" IsChecked="{Binding IsStackExpanded}" Content="{Binding Text[Show paired RAW+JPEG]}"/>
+                            <TextBlock Text="{Binding Text[Color Label]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,8,0,2"/>
                             <ComboBox Style="{StaticResource DarkComboBox}" Width="140" HorizontalAlignment="Left" SelectedValue="{Binding FilterColorLabel}" SelectedValuePath="Tag">
                                 <ComboBoxItem Content="Any" Tag="{x:Null}"/>
                                 <ComboBoxItem Content="Red" Tag="{x:Static models:ColorLabel.Red}"/>
@@ -264,7 +302,7 @@
                                 <ComboBoxItem Content="Blue" Tag="{x:Static models:ColorLabel.Blue}"/>
                                 <ComboBoxItem Content="Purple" Tag="{x:Static models:ColorLabel.Purple}"/>
                             </ComboBox>
-                            <TextBlock Text="Pick State" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,4,0,2"/>
+                            <TextBlock Text="{Binding Text[Pick State]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,4,0,2"/>
                             <ComboBox Style="{StaticResource DarkComboBox}" Width="140" HorizontalAlignment="Left" SelectedValue="{Binding FilterPickState}" SelectedValuePath="Tag">
                                 <ComboBoxItem Content="Any" Tag="{x:Null}"/>
                                 <ComboBoxItem Content="Picked" Tag="{x:Static models:PickState.Picked}"/>
@@ -273,10 +311,16 @@
                             </ComboBox>
                         </StackPanel>
 
-                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="REVIEW"/>
+                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="{Binding Text[Review]}"/>
                         <StackPanel Margin="12,4,12,6">
-                            <TextBlock Text="Preview Background" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,0,0,2"/>
-                            <ComboBox Style="{StaticResource DarkComboBox}" Width="140" HorizontalAlignment="Left" SelectedIndex="0" SelectedValue="{Binding PreviewBg}" SelectedValuePath="Tag">
+                            <TextBlock Text="{Binding Text[App Appearance]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,0,0,2"/>
+                            <ComboBox Style="{StaticResource DarkComboBox}" Width="140" HorizontalAlignment="Left" SelectedValue="{Binding AppAppearance}" SelectedValuePath="Tag">
+                                <ComboBoxItem Content="System" Tag="{x:Static models:AppAppearanceMode.System}"/>
+                                <ComboBoxItem Content="Light" Tag="{x:Static models:AppAppearanceMode.Light}"/>
+                                <ComboBoxItem Content="Dark" Tag="{x:Static models:AppAppearanceMode.Dark}"/>
+                            </ComboBox>
+                            <TextBlock Text="{Binding Text[Preview Background]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,8,0,2"/>
+                            <ComboBox Style="{StaticResource DarkComboBox}" Width="140" HorizontalAlignment="Left" SelectedValue="{Binding PreviewBg}" SelectedValuePath="Tag">
                                 <ComboBoxItem Content="System" Tag="{x:Static models:PreviewBackgroundTone.System}"/>
                                 <ComboBoxItem Content="Black" Tag="{x:Static models:PreviewBackgroundTone.Black}"/>
                                 <ComboBoxItem Content="White" Tag="{x:Static models:PreviewBackgroundTone.White}"/>
@@ -284,19 +328,38 @@
                                 <ComboBoxItem Content="Mid Gray" Tag="{x:Static models:PreviewBackgroundTone.MiddleGray}"/>
                                 <ComboBoxItem Content="Light Gray" Tag="{x:Static models:PreviewBackgroundTone.LightGray}"/>
                             </ComboBox>
-                            <TextBlock Text="Toolbar" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,8,0,2"/>
-                            <ComboBox Style="{StaticResource DarkComboBox}" Width="140" HorizontalAlignment="Left" SelectedValue="{Binding ToolbarDisplayMode}" SelectedValuePath="Tag">
+                            <TextBlock Text="{Binding Text[Review Matte]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,8,0,2"/>
+                            <ComboBox Style="{StaticResource DarkComboBox}" Width="140" HorizontalAlignment="Left" SelectedValue="{Binding ReviewMatte}" SelectedValuePath="Tag">
+                                <ComboBoxItem Content="None" Tag="{x:Static models:ReviewMatteSize.None}"/>
+                                <ComboBoxItem Content="Small" Tag="{x:Static models:ReviewMatteSize.Small}"/>
+                                <ComboBoxItem Content="Medium" Tag="{x:Static models:ReviewMatteSize.Medium}"/>
+                                <ComboBoxItem Content="Large" Tag="{x:Static models:ReviewMatteSize.Large}"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="{Binding Text[Actions]}"/>
+                        <StackPanel Margin="12,4,12,6">
+                            <Button Style="{StaticResource ToolbarButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="{Binding Text[Refresh]}" Command="{Binding RefreshCommand}"/>
+                            <Button Style="{StaticResource ToolbarButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="{Binding Text[Load Metadata]}" Margin="0,2,0,0" Command="{Binding EnrichAllMetadataCommand}"/>
+                        </StackPanel>
+
+                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="{Binding Text[Settings]}"/>
+                        <StackPanel Margin="12,4,12,10">
+                            <TextBlock Text="{Binding Text[Language]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,0,0,2"/>
+                            <ComboBox Style="{StaticResource DarkComboBox}" Width="150" HorizontalAlignment="Left" SelectedValue="{Binding AppLanguage}" SelectedValuePath="Tag">
+                                <ComboBoxItem Content="System" Tag="{x:Static models:AppLanguage.System}"/>
+                                <ComboBoxItem Content="English" Tag="{x:Static models:AppLanguage.English}"/>
+                                <ComboBoxItem Content="简体中文" Tag="{x:Static models:AppLanguage.Chinese}"/>
+                                <ComboBoxItem Content="Deutsch" Tag="{x:Static models:AppLanguage.German}"/>
+                            </ComboBox>
+                            <TextBlock Text="{Binding Text[Toolbar]}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,8,0,2"/>
+                            <ComboBox Style="{StaticResource DarkComboBox}" Width="150" HorizontalAlignment="Left" SelectedValue="{Binding ToolbarDisplayMode}" SelectedValuePath="Tag">
                                 <ComboBoxItem Content="Icons Only" Tag="{x:Static models:ToolbarDisplayMode.IconOnly}"/>
                                 <ComboBoxItem Content="Text Only" Tag="{x:Static models:ToolbarDisplayMode.TextOnly}"/>
                                 <ComboBoxItem Content="Icons + Text" Tag="{x:Static models:ToolbarDisplayMode.Both}"/>
                             </ComboBox>
-                            <Button Style="{StaticResource ToolbarButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="Generate Proxies" Margin="0,6,0,0" Command="{Binding GenerateProxiesCommand}"/>
-                        </StackPanel>
-
-                        <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="ACTIONS"/>
-                        <StackPanel Margin="12,4,12,6">
-                            <Button Style="{StaticResource ToolbarButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="Refresh" Command="{Binding RefreshCommand}"/>
-                            <Button Style="{StaticResource ToolbarButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="Load Metadata" Margin="0,2,0,0" Command="{Binding EnrichAllMetadataCommand}"/>
+                            <TextBlock Text="{Binding ActivePreset.Name, StringFormat='Workspace: {0}'}" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,8,0,2"/>
+                            <Button Style="{StaticResource ToolbarButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Content="{Binding Text[Generate Proxies]}" Margin="0,4,0,0" Command="{Binding GenerateProxiesCommand}"/>
                         </StackPanel>
 
                     </StackPanel>
@@ -478,107 +541,7 @@
                         </Border>
 
                         <Border Visibility="{Binding ViewMode, Converter={StaticResource ViewModeConv}, ConverterParameter=Gallery}" Background="{StaticResource AppBackground}">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="4"/>
-                                    <ColumnDefinition Width="240" MinWidth="180"/>
-                                </Grid.ColumnDefinitions>
-
-                                <views:GalleryView Grid.Column="0"/>
-
-                                <GridSplitter Grid.Column="1" Width="4" Background="Transparent" HorizontalAlignment="Stretch" Cursor="SizeWE"/>
-
-                                <Border Grid.Column="2" Background="{StaticResource PanelBackground}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1,0,0,0">
-                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                                        <Grid>
-                                        <StackPanel Margin="12,10" Visibility="{Binding SelectedItem, Converter={StaticResource NullToVisibility}}">
-
-                                            <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="INFO" Margin="0,0,0,4"/>
-                                            <TextBlock Text="{Binding SelectedItem.Filename}" FontSize="11" Foreground="{StaticResource ForegroundPrimary}" TextWrapping="Wrap" Margin="0,0,0,2"/>
-                                            <TextBlock FontSize="9" Foreground="{StaticResource ForegroundSecondary}" Margin="0,0,0,6">
-                                                <Run Text="{Binding SelectedItem.FileSize, Converter={StaticResource FileSize}}"/>
-                                                <Run Text=" · "/>
-                                                <Run Text="{Binding SelectedItem.FileExtension, Converter={StaticResource MediaTypeDisplay}}"/>
-                                            </TextBlock>
-
-                                            <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="REVIEW" Margin="0,4,0,4"/>
-                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                                <Button FontSize="10" Content="☆" ToolTip="No Rating" Command="{Binding SetRatingCommand}" CommandParameter="0">
-                                                    <Button.Style><Style TargetType="Button" BasedOn="{StaticResource IconButton}"/></Button.Style>
-                                                </Button>
-                                                <Button FontSize="10" ToolTip="Rate 1" Command="{Binding SetRatingCommand}" CommandParameter="1">
-                                                    <Button.Style><Style TargetType="Button" BasedOn="{StaticResource IconButton}"><Setter Property="Content" Value="☆"/><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="1"><Setter Property="Content" Value="★"/></DataTrigger><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="2"><Setter Property="Content" Value="★"/></DataTrigger><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="3"><Setter Property="Content" Value="★"/></DataTrigger><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="4"><Setter Property="Content" Value="★"/></DataTrigger><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="5"><Setter Property="Content" Value="★"/></DataTrigger></Style.Triggers></Style></Button.Style>
-                                                </Button>
-                                                <Button FontSize="10" ToolTip="Rate 2" Command="{Binding SetRatingCommand}" CommandParameter="2">
-                                                    <Button.Style><Style TargetType="Button" BasedOn="{StaticResource IconButton}"><Setter Property="Content" Value="☆"/><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="2"><Setter Property="Content" Value="★"/></DataTrigger><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="3"><Setter Property="Content" Value="★"/></DataTrigger><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="4"><Setter Property="Content" Value="★"/></DataTrigger><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="5"><Setter Property="Content" Value="★"/></DataTrigger></Style.Triggers></Style></Button.Style>
-                                                </Button>
-                                                <Button FontSize="10" ToolTip="Rate 3" Command="{Binding SetRatingCommand}" CommandParameter="3">
-                                                    <Button.Style><Style TargetType="Button" BasedOn="{StaticResource IconButton}"><Setter Property="Content" Value="☆"/><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="3"><Setter Property="Content" Value="★"/></DataTrigger><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="4"><Setter Property="Content" Value="★"/></DataTrigger><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="5"><Setter Property="Content" Value="★"/></DataTrigger></Style.Triggers></Style></Button.Style>
-                                                </Button>
-                                                <Button FontSize="10" ToolTip="Rate 4" Command="{Binding SetRatingCommand}" CommandParameter="4">
-                                                    <Button.Style><Style TargetType="Button" BasedOn="{StaticResource IconButton}"><Setter Property="Content" Value="☆"/><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="4"><Setter Property="Content" Value="★"/></DataTrigger><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="5"><Setter Property="Content" Value="★"/></DataTrigger></Style.Triggers></Style></Button.Style>
-                                                </Button>
-                                                <Button FontSize="10" ToolTip="Rate 5" Command="{Binding SetRatingCommand}" CommandParameter="5">
-                                                    <Button.Style><Style TargetType="Button" BasedOn="{StaticResource IconButton}"><Setter Property="Content" Value="☆"/><Style.Triggers><DataTrigger Binding="{Binding SelectedItem.Rating}" Value="5"><Setter Property="Content" Value="★"/></DataTrigger></Style.Triggers></Style></Button.Style>
-                                                </Button>
-                                            </StackPanel>
-
-                                            <TextBlock Text="Pick State" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,2,0,2"/>
-                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                                <Button Style="{StaticResource ToolbarButton}" FontSize="10" Content="Unmarked" Width="60" Command="{Binding SetPickStateCommand}" CommandParameter="Unmarked"/>
-                                                <Button Style="{StaticResource ToolbarButton}" FontSize="10" Content="Pick" Width="38" Foreground="{StaticResource SuccessBrush}" Command="{Binding SetPickStateCommand}" CommandParameter="Pick"/>
-                                                <Button Style="{StaticResource ToolbarButton}" FontSize="10" Content="Reject" Width="44" Foreground="{StaticResource DangerBrush}" Command="{Binding SetPickStateCommand}" CommandParameter="Reject"/>
-                                            </StackPanel>
-
-                                            <TextBlock Text="Color Label" FontSize="10" Foreground="{StaticResource ForegroundSecondary}" Margin="0,2,0,2"/>
-                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                                <Button Width="18" Height="18" Margin="0,0,2,0" ToolTip="None" Command="{Binding SetColorLabelCommand}" CommandParameter=""><Button.Template><ControlTemplate TargetType="Button"><Border Background="Transparent" CornerRadius="2" BorderBrush="#555" BorderThickness="1"><TextBlock Text="✕" FontSize="8" Foreground="#777" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border></ControlTemplate></Button.Template></Button>
-                                                <Button Width="18" Height="18" Margin="0,0,2,0" ToolTip="Red" Command="{Binding SetColorLabelCommand}" CommandParameter="Red"><Button.Template><ControlTemplate TargetType="Button"><Border Background="#E53935" CornerRadius="2"/></ControlTemplate></Button.Template></Button>
-                                                <Button Width="18" Height="18" Margin="0,0,2,0" ToolTip="Yellow" Command="{Binding SetColorLabelCommand}" CommandParameter="Yellow"><Button.Template><ControlTemplate TargetType="Button"><Border Background="#FDD835" CornerRadius="2"/></ControlTemplate></Button.Template></Button>
-                                                <Button Width="18" Height="18" Margin="0,0,2,0" ToolTip="Green" Command="{Binding SetColorLabelCommand}" CommandParameter="Green"><Button.Template><ControlTemplate TargetType="Button"><Border Background="#43A047" CornerRadius="2"/></ControlTemplate></Button.Template></Button>
-                                                <Button Width="18" Height="18" Margin="0,0,2,0" ToolTip="Blue" Command="{Binding SetColorLabelCommand}" CommandParameter="Blue"><Button.Template><ControlTemplate TargetType="Button"><Border Background="#1E88E5" CornerRadius="2"/></ControlTemplate></Button.Template></Button>
-                                                <Button Width="18" Height="18" Margin="0,0,2,0" ToolTip="Purple" Command="{Binding SetColorLabelCommand}" CommandParameter="Purple"><Button.Template><ControlTemplate TargetType="Button"><Border Background="#8E24AA" CornerRadius="2"/></ControlTemplate></Button.Template></Button>
-                                            </StackPanel>
-
-                                            <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="METADATA" Margin="0,6,0,4"/>
-                                            <TextBlock FontSize="9" Foreground="{StaticResource ForegroundSecondary}" Margin="0,1,0,1"><Run Text="Camera: "/><Run Text="{Binding SelectedItem.CameraModel}" Foreground="{StaticResource ForegroundPrimary}"/></TextBlock>
-                                            <TextBlock FontSize="9" Foreground="{StaticResource ForegroundSecondary}" Margin="0,1,0,1"><Run Text="Lens: "/><Run Text="{Binding SelectedItem.LensModel}" Foreground="{StaticResource ForegroundPrimary}"/></TextBlock>
-                                            <TextBlock FontSize="9" Foreground="{StaticResource ForegroundSecondary}" Margin="0,1,0,1"><Run Text="ISO "/><Run Text="{Binding SelectedItem.Iso}" Foreground="{StaticResource ForegroundPrimary}"/><Run Text="  f/"/><Run Text="{Binding SelectedItem.Aperture}" Foreground="{StaticResource ForegroundPrimary}"/><Run Text="  "/><Run Text="{Binding SelectedItem.FocalLength, StringFormat='{}{0}mm'}" Foreground="{StaticResource ForegroundPrimary}"/></TextBlock>
-                                            <TextBlock FontSize="9" Foreground="{StaticResource ForegroundSecondary}" Margin="0,1,0,1"><Run Text="Shutter: "/><Run Text="{Binding SelectedItem.ShutterSpeed}" Foreground="{StaticResource ForegroundPrimary}"/></TextBlock>
-                                            <TextBlock FontSize="9" Foreground="{StaticResource ForegroundSecondary}" Margin="0,1,0,1"><Run Text="Date: "/><Run Text="{Binding SelectedItem.CaptureDate, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Foreground="{StaticResource ForegroundPrimary}"/></TextBlock>
-                                            <TextBlock FontSize="9" Foreground="{StaticResource ForegroundSecondary}" Margin="0,1,0,1"><Run Text="Dimensions: "/><Run Text="{Binding SelectedItem.PixelWidth}" Foreground="{StaticResource ForegroundPrimary}"/><Run Text=" × "/><Run Text="{Binding SelectedItem.PixelHeight}" Foreground="{StaticResource ForegroundPrimary}"/></TextBlock>
-                                            <TextBlock FontSize="9" Foreground="{StaticResource ForegroundSecondary}" Margin="0,1,0,1" Visibility="{Binding SelectedItem.ColorSpaceName, Converter={StaticResource NullToVisibility}}"><Run Text="Color: "/><Run Text="{Binding SelectedItem.ColorSpaceName}" Foreground="{StaticResource ForegroundPrimary}"/></TextBlock>
-                                            <TextBlock FontSize="9" Foreground="{StaticResource ForegroundSecondary}" Margin="0,4,0,0"><Run Text="XMP: "/><Run Text="{Binding SelectedItem.XmpStatus}"/></TextBlock>
-
-                                            <StackPanel Margin="0,10,0,0" Visibility="{Binding HistogramPlacement, Converter={StaticResource EnumEquality}, ConverterParameter=Inspector}">
-                                                <DockPanel Margin="0,0,0,4">
-                                                    <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="HISTOGRAM" Margin="0"/>
-                                                    <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="↗" Width="22" Height="18" ToolTip="Move to floating" Command="{Binding SetHistogramPlacementCommand}" CommandParameter="Floating"/>
-                                                </DockPanel>
-                                                <Border Height="108" Background="#CC1E1E1E" CornerRadius="3" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
-                                                    <controls:HistogramView Data="{Binding HistogramChannel}" DisplayMode="{Binding HistogramMode}"/>
-                                                </Border>
-                                            </StackPanel>
-
-                                            <StackPanel Margin="0,10,0,0" Visibility="{Binding WaveformPlacement, Converter={StaticResource EnumEquality}, ConverterParameter=Inspector}">
-                                                <DockPanel Margin="0,0,0,4">
-                                                    <TextBlock Style="{StaticResource SidebarSectionHeader}" Text="WAVEFORM" Margin="0"/>
-                                                    <Button DockPanel.Dock="Right" Style="{StaticResource IconButton}" Content="↗" Width="22" Height="18" ToolTip="Move to floating" Command="{Binding SetWaveformPlacementCommand}" CommandParameter="Floating"/>
-                                                </DockPanel>
-                                                <Border Height="124" Background="#CC1E1E1E" CornerRadius="3" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
-                                                    <controls:WaveformView Waveform="{Binding WaveformData}" MaxValue="{Binding WaveformMaxValue}" ChannelMode="{Binding WaveformChannelMode}"/>
-                                                </Border>
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                        <StackPanel Margin="12,10" Visibility="{Binding SelectedItem, Converter={StaticResource NullToVisibility}, ConverterParameter=Invert}">
-                                            <TextBlock Text="Select media to edit rating, label, and copy state." FontSize="11" Foreground="{StaticResource ForegroundSecondary}" TextWrapping="Wrap"/>
-                                        </StackPanel>
-                                        </Grid>
-                                    </ScrollViewer>
-                                </Border>
-                            </Grid>
+                            <views:GalleryView/>
                         </Border>
 
                         <Border Background="{StaticResource AppBackground}" Visibility="{Binding HasItems, Converter={StaticResource InverseBool}}">
@@ -603,6 +566,10 @@
                     </Grid>
                 </Grid>
             </Border>
+
+            <GridSplitter Grid.Column="3" Width="4" Background="Transparent" HorizontalAlignment="Stretch" Cursor="SizeWE"/>
+
+            <views:InspectorPanel Grid.Column="4"/>
         </Grid>
 
         <Grid Grid.Row="2">

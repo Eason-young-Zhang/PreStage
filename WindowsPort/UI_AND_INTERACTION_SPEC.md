@@ -10,7 +10,7 @@ The Windows UI should preserve the macOS app's working layout:
 
 ```text
 Toolbar
-  Copy | Copy Settings | Share/Export | More | Search
+  Copy | Copy Settings | More | Search
 
 Left Sidebar
   Camera card status
@@ -41,6 +41,7 @@ Bottom Gallery Area
 
 - Work-focused and dense.
 - Dark mode should be excellent.
+- Scrollbars, menus, buttons, and inspector panels should use the same dark neutral control language.
 - Neutral backgrounds: black, white, dark gray, middle gray, light gray, system.
 - Avoid marketing-style cards and decorative hero layouts.
 - Use clear icon buttons.
@@ -66,7 +67,7 @@ Bottom Gallery Area
 ### Gallery View
 
 - Main image preview.
-- Right inspector.
+- Right inspector remains a full-height main-window column, not a gallery-only subpanel.
 - Bottom filmstrip.
 - Filmstrip item frames must match actual thumbnail image aspect ratio.
 - Crop masks/guides must match actual rendered image rect.
@@ -97,8 +98,23 @@ Windows equivalents can use Ctrl instead of Cmd:
 ## Scopes
 
 - Histogram and waveform should support floating and inspector placement.
-- Floating panels should be draggable, resizable, and constrained inside preview bounds.
+- Floating panels should keep their settings inside the panel chrome so settings move with the graph.
+- Histogram and waveform should share the same panel chrome, title bar, placement controls, and compact setting chips.
 - Light mode readability must be explicitly tested.
+
+## Source And Target Branches
+
+- Source and target cards show the chosen root folder and the active branch.
+- Clicking a child folder changes only the active branch; it must not replace the root folder.
+- Source scanning uses the active source branch.
+- Copy destination uses the active target branch.
+- Preserve-structure copy still calculates relative paths from the source root.
+
+## Localization And Settings
+
+- Language choices: system, English, Simplified Chinese, German.
+- Toolbar display choices: icons only, text only, icons plus text.
+- Low-frequency settings belong in a dedicated settings area or More menu, not scattered across unrelated workflow sections.
 
 ## Copy Settings
 

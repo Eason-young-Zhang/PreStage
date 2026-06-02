@@ -88,6 +88,19 @@ Workspace state is stored by `WorkspaceService` under:
 
 Saved state includes source/target paths, view mode, filters, copy settings, camera-card action, and layout preferences.
 
+Source and target paths use a two-level model:
+
+- `LocalSourcePath` / `LocalTargetPath` store the selected root folders.
+- `LocalSourceSelectionPath` / `LocalTargetSelectionPath` store the currently selected branch inside those roots.
+
+Scanning and proxy generation use the active source branch. Copy output uses the active target branch. Preserve-structure copy rules still receive the source root so child-folder browsing does not break relative destination paths.
+
+## Localization
+
+The Windows UI exposes `System`, `English`, `简体中文`, and `Deutsch` language choices. `PreStage.Core.Localization.L10n` owns the string tables, and the WPF ViewModel exposes a `LocalizedText` indexer so XAML can bind major UI labels to the active language.
+
+The current implementation covers the main window, sidebars, inspector, and scope controls. New UI should avoid hard-coded user-facing strings where practical and add keys to the English fallback plus Chinese and German dictionaries.
+
 ## XMP Sidecar Behavior
 
 PreStage writes review state to XMP sidecars:

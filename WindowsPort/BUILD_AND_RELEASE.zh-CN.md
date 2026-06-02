@@ -8,7 +8,7 @@ Language: [English](BUILD_AND_RELEASE.md) | 简体中文
 # 还原依赖
 dotnet restore PreStage.slnx
 
-# 测试（当前 54 个测试）
+# 测试（当前 56 个测试）
 dotnet test PreStage.Tests\PreStage.Tests.csproj -v minimal -m:1 -nr:false
 
 # 构建

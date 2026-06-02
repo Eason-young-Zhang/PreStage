@@ -88,6 +88,19 @@ xUnit 测试，覆盖核心行为和几何逻辑。
 
 保存内容包括源/目标路径、视图模式、过滤器、复制设置、相机卡动作和布局偏好。
 
+源路径和目标路径采用两层模型：
+
+- `LocalSourcePath` / `LocalTargetPath` 保存用户选择的根目录。
+- `LocalSourceSelectionPath` / `LocalTargetSelectionPath` 保存根目录内当前选中的分支。
+
+扫描和代理生成使用当前源分支。复制输出使用当前目标分支。保留目录结构的复制规则仍接收源根目录，因此浏览子目录不会破坏相对目标路径。
+
+## 本地化
+
+Windows UI 提供 `System`、`English`、`简体中文` 和 `Deutsch` 语言选择。`PreStage.Core.Localization.L10n` 维护字符串表，WPF ViewModel 暴露 `LocalizedText` 索引器，使 XAML 中的主要 UI 标签可以绑定到当前语言。
+
+当前实现已覆盖主窗口、侧边栏、检查器和 scope 控件。新增 UI 应尽量避免硬编码用户可见文本，并为英文回退、中文和德文字典补充 key。
+
 ## XMP Sidecar 行为
 
 PreStage 将审片状态写入 XMP sidecar：

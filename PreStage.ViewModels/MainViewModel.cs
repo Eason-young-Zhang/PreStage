@@ -20,6 +20,7 @@ public partial class MainViewModel : ObservableObject
     private readonly CameraCardService _cameraCardService = new();
     private CopyService? _activeCopyService;
     private WorkspaceLibrary _library;
+    private bool _isRestoringWorkspace;
 
     public Dictionary<string, BitmapSource> ThumbnailCache { get; private set; } = new();
     private int _thumbnailVersion;
@@ -31,6 +32,9 @@ public partial class MainViewModel : ObservableObject
     partial void OnSourcePathChanged(string value)
     {
         SourceFolderTree = LoadFolderNodes(value);
+        OnPropertyChanged(nameof(SourceFolderName));
+        OnPropertyChanged(nameof(SourcePathSummary));
+        OnPropertyChanged(nameof(SourceSelectionSummary));
     }
 
     [ObservableProperty]
@@ -39,6 +43,29 @@ public partial class MainViewModel : ObservableObject
     partial void OnTargetPathChanged(string value)
     {
         TargetFolderTree = LoadFolderNodes(value);
+        OnPropertyChanged(nameof(TargetFolderName));
+        OnPropertyChanged(nameof(TargetPathSummary));
+        OnPropertyChanged(nameof(TargetSelectionSummary));
+    }
+
+    [ObservableProperty]
+    private string _sourceSelectionPath = "";
+
+    partial void OnSourceSelectionPathChanged(string value)
+    {
+        OnPropertyChanged(nameof(SourceSelectionFolderName));
+        OnPropertyChanged(nameof(SourceSelectionSummary));
+        OnPropertyChanged(nameof(EffectiveSourcePath));
+    }
+
+    [ObservableProperty]
+    private string _targetSelectionPath = "";
+
+    partial void OnTargetSelectionPathChanged(string value)
+    {
+        OnPropertyChanged(nameof(TargetSelectionFolderName));
+        OnPropertyChanged(nameof(TargetSelectionSummary));
+        OnPropertyChanged(nameof(EffectiveTargetPath));
     }
 
     [ObservableProperty]
@@ -234,11 +261,29 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private AppAppearanceMode _appAppearance = AppAppearanceMode.System;
 
+    partial void OnAppAppearanceChanged(AppAppearanceMode value)
+    {
+        if (_isRestoringWorkspace) return;
+        _ = SaveWorkspaceAsync();
+    }
+
     [ObservableProperty]
     private PreviewBackgroundTone _previewBg = PreviewBackgroundTone.System;
 
+    partial void OnPreviewBgChanged(PreviewBackgroundTone value)
+    {
+        if (_isRestoringWorkspace) return;
+        _ = SaveWorkspaceAsync();
+    }
+
     [ObservableProperty]
     private ReviewMatteSize _reviewMatte = ReviewMatteSize.None;
+
+    partial void OnReviewMatteChanged(ReviewMatteSize value)
+    {
+        if (_isRestoringWorkspace) return;
+        _ = SaveWorkspaceAsync();
+    }
 
     [ObservableProperty]
     private bool _flippedHorizontally;
@@ -248,6 +293,23 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private ToolbarDisplayMode _toolbarDisplayMode = ToolbarDisplayMode.IconOnly;
+
+    partial void OnToolbarDisplayModeChanged(ToolbarDisplayMode value)
+    {
+        if (_isRestoringWorkspace) return;
+        _ = SaveWorkspaceAsync();
+    }
+
+    [ObservableProperty]
+    private AppLanguage _appLanguage = AppLanguage.System;
+
+    partial void OnAppLanguageChanged(AppLanguage value)
+    {
+        ApplyLanguage(value);
+        Text.Refresh();
+        if (_isRestoringWorkspace) return;
+        _ = SaveWorkspaceAsync();
+    }
 
     [ObservableProperty]
     private CameraCardAction _cameraCardAction = CameraCardAction.Notify;
@@ -264,10 +326,23 @@ public partial class MainViewModel : ObservableObject
     private ObservableCollection<FilmstripItem> _filmstripItems = [];
     public ObservableCollection<CameraCardInfo> DetectedCards { get; } = [];
     public List<MediaItem> RawItems { get; private set; } = [];
+    public string SourceFolderName => FolderNameOrPlaceholder(SourcePath, "Choose source folder");
+    public string TargetFolderName => FolderNameOrPlaceholder(TargetPath, "Choose target folder");
+    public string SourceSelectionFolderName => FolderNameOrPlaceholder(EffectiveSourcePath, "Root folder");
+    public string TargetSelectionFolderName => FolderNameOrPlaceholder(EffectiveTargetPath, "Root folder");
+    public string SourcePathSummary => string.IsNullOrWhiteSpace(SourcePath) ? "No source selected" : SourcePath;
+    public string TargetPathSummary => string.IsNullOrWhiteSpace(TargetPath) ? "No target selected" : TargetPath;
+    public string SourceSelectionSummary => string.IsNullOrWhiteSpace(SourceSelectionPath) || string.Equals(SourceSelectionPath, SourcePath, StringComparison.OrdinalIgnoreCase)
+        ? "Browsing root folder" : SourceSelectionPath;
+    public string TargetSelectionSummary => string.IsNullOrWhiteSpace(TargetSelectionPath) || string.Equals(TargetSelectionPath, TargetPath, StringComparison.OrdinalIgnoreCase)
+        ? "Copying to root folder" : TargetSelectionPath;
+    public string EffectiveSourcePath => string.IsNullOrWhiteSpace(SourceSelectionPath) ? SourcePath : SourceSelectionPath;
+    public string EffectiveTargetPath => string.IsNullOrWhiteSpace(TargetSelectionPath) ? TargetPath : TargetSelectionPath;
 
     public FilterState Filter { get; } = new();
     public PanelLayout PanelLayout { get; } = new();
     public WorkspacePreset ActivePreset { get; private set; } = WorkspacePreset.Default;
+    public LocalizedText Text { get; } = new();
 
     public MainViewModel()
     {
@@ -277,6 +352,15 @@ public partial class MainViewModel : ObservableObject
         _cameraCardService.CardsChanged += OnCameraCardsChanged;
         _cameraCardService.CardDetected += OnCameraCardDetected;
         ReplaceDetectedCards(_cameraCardService.Start());
+    }
+
+    private static string FolderNameOrPlaceholder(string path, string placeholder)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return placeholder;
+        var trimmed = path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        var name = Path.GetFileName(trimmed);
+        return string.IsNullOrWhiteSpace(name) ? trimmed : name;
     }
 
     private void OnCameraCardsChanged(IReadOnlyList<CameraCardInfo> cards)
@@ -363,39 +447,53 @@ public partial class MainViewModel : ObservableObject
 
     private void RestoreFromPreset(WorkspacePreset preset)
     {
-        SourcePath = preset.LocalSourcePath ?? "";
-        TargetPath = preset.LocalTargetPath ?? "";
-        ViewMode = preset.ViewMode;
-        SortRule = preset.SortRule;
-        IncludeSubfolders = preset.IncludeSourceSubfolders;
-        CopyRule = preset.CopyRule;
-        CopyConflictPolicy = preset.CopyConflictPolicy;
-        CopyContentMode = preset.CopyContentMode;
-        CopyVerificationMode = preset.CopyVerificationMode;
-        CameraCardAction = preset.CameraCardAction;
+        _isRestoringWorkspace = true;
+        try
+        {
+            SourcePath = preset.LocalSourcePath ?? "";
+            SourceSelectionPath = preset.LocalSourceSelectionPath ?? SourcePath;
+            TargetPath = preset.LocalTargetPath ?? "";
+            TargetSelectionPath = preset.LocalTargetSelectionPath ?? TargetPath;
+            ViewMode = preset.ViewMode;
+            SortRule = preset.SortRule;
+            IncludeSubfolders = preset.IncludeSourceSubfolders;
+            CopyRule = preset.CopyRule;
+            CopyConflictPolicy = preset.CopyConflictPolicy;
+            CopyContentMode = preset.CopyContentMode;
+            CopyVerificationMode = preset.CopyVerificationMode;
+            CameraCardAction = preset.CameraCardAction;
 
-        HistogramPlacement = preset.PanelLayout.HistogramPlacement;
-        WaveformPlacement = preset.PanelLayout.WaveformPlacement;
-        HistogramMode = preset.PanelLayout.HistogramDisplayMode;
-        WaveformDir = preset.PanelLayout.WaveformDirection;
-        WaveformChannelMode = preset.PanelLayout.WaveformChannelMode;
-        ActiveGuides = preset.PanelLayout.CompositionOverlays;
-        GuideColor = preset.PanelLayout.CompositionOverlayColor;
-        GuideOpacity = preset.PanelLayout.CompositionOverlayOpacity;
-        GuidesFollowCrop = preset.PanelLayout.CompositionGuidesFollowCrop;
-        ActiveCropRatio = preset.PanelLayout.CropGuideRatio;
-        CropStyle = preset.PanelLayout.CropGuideStyle;
-        CropOrientation = preset.PanelLayout.CropGuideOrientation;
-        CustomCropRatios = preset.PanelLayout.CustomCropGuideRatios;
-        ActiveCustomCropRatioId = preset.PanelLayout.ActiveCustomCropGuideRatioId;
-        AppAppearance = preset.PanelLayout.AppAppearance;
-        PreviewBg = preset.PanelLayout.PreviewBackground;
-        ReviewMatte = preset.PanelLayout.ReviewMatteSize;
+            HistogramPlacement = preset.PanelLayout.HistogramPlacement;
+            WaveformPlacement = preset.PanelLayout.WaveformPlacement;
+            HistogramMode = preset.PanelLayout.HistogramDisplayMode;
+            WaveformDir = preset.PanelLayout.WaveformDirection;
+            WaveformChannelMode = preset.PanelLayout.WaveformChannelMode;
+            ActiveGuides = preset.PanelLayout.CompositionOverlays;
+            GuideColor = preset.PanelLayout.CompositionOverlayColor;
+            GuideOpacity = preset.PanelLayout.CompositionOverlayOpacity;
+            GuidesFollowCrop = preset.PanelLayout.CompositionGuidesFollowCrop;
+            ActiveCropRatio = preset.PanelLayout.CropGuideRatio;
+            CropStyle = preset.PanelLayout.CropGuideStyle;
+            CropOrientation = preset.PanelLayout.CropGuideOrientation;
+            CustomCropRatios = preset.PanelLayout.CustomCropGuideRatios;
+            ActiveCustomCropRatioId = preset.PanelLayout.ActiveCustomCropGuideRatioId;
+            AppAppearance = preset.PanelLayout.AppAppearance;
+            PreviewBg = preset.PanelLayout.PreviewBackground;
+            ReviewMatte = preset.PanelLayout.ReviewMatteSize;
+            AppLanguage = preset.AppLanguage;
+            ToolbarDisplayMode = preset.PanelLayout.ToolbarDisplayMode;
+            ApplyLanguage(AppLanguage);
+            Text.Refresh();
 
-        ShowHistogram = HistogramPlacement == HistogramPlacement.Floating;
-        ShowWaveform = WaveformPlacement == HistogramPlacement.Floating;
+            ShowHistogram = HistogramPlacement == HistogramPlacement.Floating;
+            ShowWaveform = WaveformPlacement == HistogramPlacement.Floating;
+        }
+        finally
+        {
+            _isRestoringWorkspace = false;
+        }
 
-        if (!string.IsNullOrEmpty(SourcePath))
+        if (!string.IsNullOrEmpty(EffectiveSourcePath))
             _ = ScanSourceAsync();
     }
 
@@ -412,6 +510,7 @@ public partial class MainViewModel : ObservableObject
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 SourcePath = dialog.SelectedPath;
+                SourceSelectionPath = dialog.SelectedPath;
                 await SaveWorkspaceAsync();
                 await ScanSourceAsync();
             }
@@ -435,6 +534,7 @@ public partial class MainViewModel : ObservableObject
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 TargetPath = dialog.SelectedPath;
+                TargetSelectionPath = dialog.SelectedPath;
                 await SaveWorkspaceAsync();
             }
         }
@@ -447,14 +547,14 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task ScanSourceAsync()
     {
-        if (string.IsNullOrEmpty(SourcePath)) return;
+        if (string.IsNullOrEmpty(EffectiveSourcePath)) return;
 
         IsScanning = true;
         StatusText = "Scanning...";
 
         try
         {
-            RawItems = await Task.Run(() => _scanner.QuickScanWithPairing(SourcePath, IncludeSubfolders));
+            RawItems = await Task.Run(() => _scanner.QuickScanWithPairing(EffectiveSourcePath, IncludeSubfolders));
             _preheatService.ClearCache();
             ApplyFiltersAndSort();
             _ = LoadThumbnailsAsync();
@@ -541,10 +641,17 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void RefreshCameraCards()
+    {
+        ReplaceDetectedCards(_cameraCardService.Poll());
+        StatusText = $"Detected {DetectedCards.Count} removable device(s)";
+    }
+
+    [RelayCommand]
     private async Task SelectSourcePathAsync(string path)
     {
         if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path)) return;
-        SourcePath = path;
+        SourceSelectionPath = path;
         await SaveWorkspaceAsync();
         await ScanSourceAsync();
     }
@@ -553,7 +660,7 @@ public partial class MainViewModel : ObservableObject
     private async Task SelectTargetPathAsync(string path)
     {
         if (string.IsNullOrWhiteSpace(path)) return;
-        TargetPath = path;
+        TargetSelectionPath = path;
         await SaveWorkspaceAsync();
     }
 
@@ -563,6 +670,7 @@ public partial class MainViewModel : ObservableObject
         if (card == null) return;
         var path = card.DcimPath ?? card.RootPath;
         SourcePath = path;
+        SourceSelectionPath = path;
         await SaveWorkspaceAsync();
         await ScanSourceAsync();
     }
@@ -944,7 +1052,8 @@ public partial class MainViewModel : ObservableObject
     {
         if (SelectedItem == null) return;
         if (!int.TryParse(ratingStr, out var rating)) return;
-        SelectedItem.Rating = Math.Clamp(rating, 0, 5);
+        rating = Math.Clamp(rating, 0, 5);
+        SelectedItem.Rating = SelectedItem.Rating == rating && rating > 0 ? 0 : rating;
         ApplyFiltersAndSort();
         WriteXmpSidecar(SelectedItem);
     }
@@ -1110,14 +1219,14 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task ScanWithPairingAsync()
     {
-        if (string.IsNullOrEmpty(SourcePath)) return;
+        if (string.IsNullOrEmpty(EffectiveSourcePath)) return;
 
         IsScanning = true;
         StatusText = "Scanning with pairing...";
 
         try
         {
-            RawItems = await Task.Run(() => _scanner.QuickScanWithPairing(SourcePath, IncludeSubfolders));
+            RawItems = await Task.Run(() => _scanner.QuickScanWithPairing(EffectiveSourcePath, IncludeSubfolders));
             ApplyFiltersAndSort();
         }
         catch (Exception ex)
@@ -1146,7 +1255,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task StartCopyAsync()
     {
-        if (string.IsNullOrEmpty(TargetPath) || RawItems.Count == 0) return;
+        if (string.IsNullOrEmpty(EffectiveTargetPath) || RawItems.Count == 0) return;
         ShowCopySettings = false;
 
         var items = MediaItems.ToList();
@@ -1177,7 +1286,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             var log = await Task.Run(() =>
-                _activeCopyService.CopyAsync(items, TargetPath,
+                _activeCopyService.CopyAsync(items, EffectiveTargetPath,
                     CopyRule, CopyConflictPolicy, CopyContentMode, CopyVerificationMode,
                     sourceRoot: SourcePath));
 
@@ -1305,6 +1414,36 @@ public partial class MainViewModel : ObservableObject
         _ = SaveWorkspaceAsync();
     }
 
+    [RelayCommand]
+    private void SetAppLanguage(string language)
+    {
+        AppLanguage = Enum.TryParse<AppLanguage>(language, out var parsed)
+            ? parsed : AppLanguage.System;
+        ApplyLanguage(AppLanguage);
+        Text.Refresh();
+        _ = SaveWorkspaceAsync();
+    }
+
+    [RelayCommand]
+    private void SetToolbarDisplayMode(string mode)
+    {
+        ToolbarDisplayMode = Enum.TryParse<ToolbarDisplayMode>(mode, out var parsed)
+            ? parsed : ToolbarDisplayMode.IconOnly;
+        _ = SaveWorkspaceAsync();
+    }
+
+    private static void ApplyLanguage(AppLanguage language)
+    {
+        var code = language switch
+        {
+            AppLanguage.Chinese => "zh",
+            AppLanguage.German => "de",
+            AppLanguage.System => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName,
+            _ => "en"
+        };
+        PreStage.Core.Localization.L10n.SetLanguage(code);
+    }
+
     private void ComputeHistogram(MediaItem item)
     {
         var analysis = new ImageAnalysisService();
@@ -1372,7 +1511,7 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task GenerateProxiesAsync()
     {
-        if (string.IsNullOrEmpty(SourcePath) || RawItems.Count == 0) return;
+        if (string.IsNullOrEmpty(EffectiveSourcePath) || RawItems.Count == 0) return;
 
         _activeProxyService = new ProxyGenerationService();
         ProxyProgressText = "Starting proxy generation...";
@@ -1393,7 +1532,7 @@ public partial class MainViewModel : ObservableObject
         try
         {
             await Task.Run(() =>
-                _activeProxyService.GenerateProxiesAsync(SourcePath, items));
+                _activeProxyService.GenerateProxiesAsync(EffectiveSourcePath, items));
         }
         catch (Exception ex)
         {
@@ -1454,15 +1593,17 @@ public partial class MainViewModel : ObservableObject
                 FilterState = Filter,
                 SortRule = SortRule,
                 LocalSourcePath = SourcePath,
+                LocalSourceSelectionPath = SourceSelectionPath,
                 LocalTargetPath = TargetPath,
+                LocalTargetSelectionPath = TargetSelectionPath,
                 CopyRule = CopyRule,
                 CopyConflictPolicy = CopyConflictPolicy,
                 CopyContentMode = CopyContentMode,
                 CopyVerificationMode = CopyVerificationMode,
                 IncludeSourceSubfolders = IncludeSubfolders,
-                CameraCardAction = CameraCardAction
+                CameraCardAction = CameraCardAction,
+                AppLanguage = AppLanguage
             };
-
             _workspace.ApplyPreset(_library, ActivePreset);
             await Task.Run(() => _workspace.Save(_library));
         }
@@ -1490,6 +1631,7 @@ public partial class MainViewModel : ObservableObject
         PanelLayout.AppAppearance = AppAppearance;
         PanelLayout.PreviewBackground = PreviewBg;
         PanelLayout.ReviewMatteSize = ReviewMatte;
+        PanelLayout.ToolbarDisplayMode = ToolbarDisplayMode;
         return PanelLayout;
     }
 }

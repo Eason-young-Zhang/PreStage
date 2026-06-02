@@ -49,43 +49,64 @@
                 Content="▶" FontSize="16" ToolTip="Next (→)"
                 Command="{Binding NavigateGalleryCommand}" CommandParameter="Next"/>
 
-        <StackPanel Grid.Row="0" Orientation="Horizontal"
-                    Visibility="{Binding HistogramPlacement, Converter={StaticResource EnumEquality}, ConverterParameter=Floating}"
-                    HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,24,44,0">
-            <Button Style="{StaticResource IconButton}" Content="RGB+L" FontSize="8" Width="34" Height="16" ToolTip="RGB + Luminance" Command="{Binding SetHistogramModeCommand}" CommandParameter="RgbAndLuminance"/>
-            <Button Style="{StaticResource IconButton}" Content="RGB" FontSize="8" Width="26" Height="16" ToolTip="RGB" Command="{Binding SetHistogramModeCommand}" CommandParameter="Rgb"/>
-            <Button Style="{StaticResource IconButton}" Content="LUM" FontSize="8" Width="26" Height="16" ToolTip="Luminance" Command="{Binding SetHistogramModeCommand}" CommandParameter="Luminance"/>
-            <Button Style="{StaticResource IconButton}" Content="R" FontSize="8" Width="16" Height="16" ToolTip="Red" Command="{Binding SetHistogramModeCommand}" CommandParameter="Red"/>
-            <Button Style="{StaticResource IconButton}" Content="G" FontSize="8" Width="16" Height="16" ToolTip="Green" Command="{Binding SetHistogramModeCommand}" CommandParameter="Green"/>
-            <Button Style="{StaticResource IconButton}" Content="B" FontSize="8" Width="16" Height="16" ToolTip="Blue" Command="{Binding SetHistogramModeCommand}" CommandParameter="Blue"/>
-        </StackPanel>
-
-        <Border x:Name="HistogramPanel" Grid.Row="0" Width="220" Height="100"
+        <Border x:Name="HistogramPanel" Grid.Row="0" Width="246" Height="138"
                 Visibility="{Binding HistogramPlacement, Converter={StaticResource EnumEquality}, ConverterParameter=Floating}"
-                HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,44,44,0"
-                Background="#CC1E1E1E" CornerRadius="3" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="44,44,0,0"
+                Style="{StaticResource ScopePanelBorder}"
                 MouseLeftButtonDown="FloatingPanel_DragStart" MouseMove="FloatingPanel_DragMove" MouseLeftButtonUp="FloatingPanel_DragEnd">
-            <Border.ContextMenu>
-                <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                    <MenuItem Header="Move to Inspector" Command="{Binding SetHistogramPlacementCommand}" CommandParameter="Inspector"/>
-                    <MenuItem Header="Hide" Command="{Binding SetHistogramPlacementCommand}" CommandParameter="Hidden"/>
-                </ContextMenu>
-            </Border.ContextMenu>
-            <controls:HistogramView Data="{Binding HistogramChannel}" DisplayMode="{Binding HistogramMode}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="24"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="24"/>
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0" Margin="7,3,5,0">
+                    <TextBlock Text="▥ Histogram" Foreground="{StaticResource ForegroundPrimary}" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Button Style="{StaticResource IconButton}" Content="⇥" Width="20" Height="18" FontSize="10" ToolTip="Move to Inspector" Command="{Binding SetHistogramPlacementCommand}" CommandParameter="Inspector"/>
+                        <Button Style="{StaticResource IconButton}" Content="×" Width="20" Height="18" FontSize="10" ToolTip="Hide" Command="{Binding SetHistogramPlacementCommand}" CommandParameter="Hidden"/>
+                    </StackPanel>
+                </DockPanel>
+                <controls:HistogramView Grid.Row="1" Data="{Binding HistogramChannel}" DisplayMode="{Binding HistogramMode}"/>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="7,2">
+                    <Button Style="{StaticResource ScopeChipButton}" Content="RGB+L" Command="{Binding SetHistogramModeCommand}" CommandParameter="RgbAndLuminance"/>
+                    <Button Style="{StaticResource ScopeChipButton}" Content="RGB" Command="{Binding SetHistogramModeCommand}" CommandParameter="Rgb"/>
+                    <Button Style="{StaticResource ScopeChipButton}" Content="LUM" Command="{Binding SetHistogramModeCommand}" CommandParameter="Luminance"/>
+                    <Button Style="{StaticResource ScopeChipButton}" Content="R" Command="{Binding SetHistogramModeCommand}" CommandParameter="Red"/>
+                    <Button Style="{StaticResource ScopeChipButton}" Content="G" Command="{Binding SetHistogramModeCommand}" CommandParameter="Green"/>
+                    <Button Style="{StaticResource ScopeChipButton}" Content="B" Command="{Binding SetHistogramModeCommand}" CommandParameter="Blue"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <Border x:Name="WaveformPanel" Grid.Row="0" Width="240" Height="110"
+        <Border x:Name="WaveformPanel" Grid.Row="0" Width="260" Height="148"
                 Visibility="{Binding WaveformPlacement, Converter={StaticResource EnumEquality}, ConverterParameter=Floating}"
-                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="44,44,0,0"
-                Background="#CC1E1E1E" CornerRadius="3" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="44,196,0,0"
+                Style="{StaticResource ScopePanelBorder}"
                 MouseLeftButtonDown="FloatingPanel_DragStart" MouseMove="FloatingPanel_DragMove" MouseLeftButtonUp="FloatingPanel_DragEnd">
-            <Border.ContextMenu>
-                <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                    <MenuItem Header="Move to Inspector" Command="{Binding SetWaveformPlacementCommand}" CommandParameter="Inspector"/>
-                    <MenuItem Header="Hide" Command="{Binding SetWaveformPlacementCommand}" CommandParameter="Hidden"/>
-                </ContextMenu>
-            </Border.ContextMenu>
-            <controls:WaveformView Waveform="{Binding WaveformData}" MaxValue="{Binding WaveformMaxValue}" ChannelMode="{Binding WaveformChannelMode}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="24"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="24"/>
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0" Margin="7,3,5,0">
+                    <TextBlock Text="⌁ Waveform" Foreground="{StaticResource ForegroundPrimary}" FontSize="10" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Button Style="{StaticResource IconButton}" Content="⇥" Width="20" Height="18" FontSize="10" ToolTip="Move to Inspector" Command="{Binding SetWaveformPlacementCommand}" CommandParameter="Inspector"/>
+                        <Button Style="{StaticResource IconButton}" Content="×" Width="20" Height="18" FontSize="10" ToolTip="Hide" Command="{Binding SetWaveformPlacementCommand}" CommandParameter="Hidden"/>
+                    </StackPanel>
+                </DockPanel>
+                <controls:WaveformView Grid.Row="1" Waveform="{Binding WaveformData}" MaxValue="{Binding WaveformMaxValue}" ChannelMode="{Binding WaveformChannelMode}"/>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="7,2">
+                    <Button Style="{StaticResource ScopeChipButton}" Content="LUM" Command="{Binding SetWaveformChannelModeCommand}" CommandParameter="Luminance"/>
+                    <Button Style="{StaticResource ScopeChipButton}" Content="RGB" Command="{Binding SetWaveformChannelModeCommand}" CommandParameter="Rgb"/>
+                    <Button Style="{StaticResource ScopeChipButton}" Content="R" Command="{Binding SetWaveformChannelModeCommand}" CommandParameter="Red"/>
+                    <Button Style="{StaticResource ScopeChipButton}" Content="G" Command="{Binding SetWaveformChannelModeCommand}" CommandParameter="Green"/>
+                    <Button Style="{StaticResource ScopeChipButton}" Content="B" Command="{Binding SetWaveformChannelModeCommand}" CommandParameter="Blue"/>
+                    <Button Style="{StaticResource ScopeChipButton}" Content="X/Y" ToolTip="Toggle direction" Command="{Binding ToggleWaveformDirectionCommand}"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
         <Border Grid.Row="1" Background="{StaticResource ToolbarBackground}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,1" Height="28">
@@ -97,8 +118,8 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="6,0,0,0">
-                    <Button Style="{StaticResource IconButton}" Content="📊" ToolTip="Histogram (H)" FontSize="11" Command="{Binding ToggleHistogramCommand}"/>
-                    <Button Style="{StaticResource IconButton}" Content="〰" ToolTip="Waveform (W)" FontSize="11" Command="{Binding ToggleWaveformCommand}"/>
+                    <Button Style="{StaticResource IconButton}" Content="▥" ToolTip="Histogram (H)" FontSize="11" Command="{Binding ToggleHistogramCommand}"/>
+                    <Button Style="{StaticResource IconButton}" Content="📈" ToolTip="Waveform (W)" FontSize="11" Command="{Binding ToggleWaveformCommand}"/>
                     <Button Style="{StaticResource IconButton}" Content="↔" ToolTip="Waveform Direction" FontSize="11" Command="{Binding ToggleWaveformDirectionCommand}"/>
                     <Separator Style="{StaticResource DarkSeparator}" Margin="2,0"/>
                     <Button Style="{StaticResource IconButton}" Content="⊞" ToolTip="Rule of Thirds" Command="{Binding ToggleGuideCommand}" CommandParameter="Thirds"/>

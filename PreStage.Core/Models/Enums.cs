@@ -222,7 +222,8 @@ public enum AppLanguage
 {
     System,
     English,
-    Chinese
+    Chinese,
+    German
 }
 
 public enum ToolbarDisplayMode

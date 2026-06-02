@@ -1,5 +1,7 @@
 # Feature Parity Checklist / 功能对齐清单
 
+Language: English | [简体中文](FEATURE_PARITY_CHECKLIST.zh-CN.md)
+
 Last updated: 2026-05-26
 
 Use this checklist to track Windows implementation against the macOS reference.

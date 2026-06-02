@@ -1,5 +1,7 @@
 # UI And Interaction Spec / 界面与交互规格
 
+Language: English | [简体中文](UI_AND_INTERACTION_SPEC.zh-CN.md)
+
 Last updated: 2026-05-26
 
 ## Main Window Layout

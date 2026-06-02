@@ -1,5 +1,7 @@
 # Troubleshooting
 
+Language: English | [简体中文](troubleshooting.zh-CN.md)
+
 ## MSBuild Access Denied Under `obj/`
 
 Symptoms:

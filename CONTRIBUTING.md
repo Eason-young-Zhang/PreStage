@@ -1,5 +1,7 @@
 # Contributing to PreStage
 
+Language: English | [简体中文](CONTRIBUTING.zh-CN.md)
+
 Thanks for helping improve PreStage. This project has two implementations in one repository:
 
 - `PreStage-Mac` is the macOS reference implementation.

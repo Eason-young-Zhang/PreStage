@@ -1,5 +1,7 @@
 # Test And Acceptance Plan / 测试与验收计划
 
+Language: English | [简体中文](TEST_AND_ACCEPTANCE_PLAN.zh-CN.md)
+
 Last updated: 2026-05-26
 
 ## Build Verification

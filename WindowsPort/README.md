@@ -1,5 +1,7 @@
 # PreStage Windows Port Handoff
 
+Language: English | [简体中文](README.zh-CN.md)
+
 Last updated: 2026-05-26
 
 This folder is a dedicated handoff package for building a Windows x86 version of PreStage. The macOS codebase remains the product reference, but the Windows implementation should use Windows-native APIs and controls where practical.

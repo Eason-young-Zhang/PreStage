@@ -1,5 +1,7 @@
 # Architecture Overview
 
+Language: English | [简体中文](architecture.zh-CN.md)
+
 PreStage is organized around a simple photo workflow:
 
 1. Select a source folder or camera-card DCIM folder.

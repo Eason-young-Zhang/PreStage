@@ -1,5 +1,7 @@
 # Windows Port Project Brief / Windows 移植项目总说明
 
+Language: English | [简体中文](PROJECT_BRIEF.zh-CN.md)
+
 Last updated: 2026-05-26
 
 ## 1. Product Mission / 产品使命

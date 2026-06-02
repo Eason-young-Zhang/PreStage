@@ -1,5 +1,7 @@
 # Architecture Mapping / 架构映射
 
+Language: English | [简体中文](ARCHITECTURE_MAPPING.zh-CN.md)
+
 Last updated: 2026-05-26
 
 This document maps macOS concepts to likely Windows equivalents.

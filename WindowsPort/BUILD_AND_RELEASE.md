@@ -1,5 +1,7 @@
 # PreStage Windows Build & Release
 
+Language: English | [简体中文](BUILD_AND_RELEASE.zh-CN.md)
+
 ## Dev Commands
 
 ```powershell

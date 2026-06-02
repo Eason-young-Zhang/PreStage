@@ -1,5 +1,7 @@
 # PreStage
 
+Language: English | [简体中文](README.zh-CN.md)
+
 PreStage is a cross-platform photo ingest and review tool for photographers who need a fast source-to-target workflow before the final editing stage. It focuses on browsing camera folders, reviewing images, writing XMP sidecars, and copying selected media into an organized destination.
 
 The macOS version is the product reference implementation. The Windows version is an actively developed WPF port that aims to match the same workflow, terminology, and review experience as closely as possible.

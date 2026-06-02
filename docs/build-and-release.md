@@ -1,5 +1,7 @@
 # Build and Release Guide
 
+Language: English | [简体中文](build-and-release.zh-CN.md)
+
 This guide covers the Windows WPF port. The macOS reference implementation has its own scripts under `PreStage-Mac/script`.
 
 ## Prerequisites

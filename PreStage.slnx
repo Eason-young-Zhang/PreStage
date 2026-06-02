@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="PreStage.App/PreStage.App.csproj" />
+  <Project Path="PreStage.Core/PreStage.Core.csproj" />
+  <Project Path="PreStage.Tests/PreStage.Tests.csproj" />
+  <Project Path="PreStage.ViewModels/PreStage.ViewModels.csproj" />
+</Solution>

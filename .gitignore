@@ -1,0 +1,23 @@
+bin/
+obj/
+artifacts/
+*.user
+*.suo
+*.vs/
+.vscode/
+
+# Local build and release outputs
+output/
+publish/
+publish*/
+releases/
+*.zip
+*.nupkg
+
+# Nested comparison/reference worktrees that should not be vendored.
+PreStage-Win-Trae/
+
+# macOS packaged binaries; keep source/docs under PreStage-Mac.
+PreStage-Mac/dist/
+PreStage-Mac/.build/
+**/.DS_Store

@@ -1,0 +1,52 @@
+<UserControl x:Class="PreStage.App.Views.CopyLogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:PreStage.App.Converters"
+             Background="{StaticResource PanelBackground}"
+             BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
+    <UserControl.Resources>
+        <conv:FileSizeConverter x:Key="FileSize"/>
+    </UserControl.Resources>
+
+    <Grid Margin="12" MaxHeight="180">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,4">
+            <TextBlock Text="Copy Log" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource ForegroundPrimary}" VerticalAlignment="Center"/>
+            <TextBlock FontSize="10" Foreground="{StaticResource ForegroundSecondary}" VerticalAlignment="Center" Margin="8,0,0,0">
+                <Run Text="{Binding LastCopyLog.TotalItems}"/>
+                <Run Text=" items · "/>
+                <Run Text="{Binding LastCopyLog.TotalBytes, Converter={StaticResource FileSize}}"/>
+            </TextBlock>
+        </StackPanel>
+
+        <ListView Grid.Row="1" Background="Transparent" BorderThickness="0" FontSize="10" ItemsSource="{Binding LastCopyLog.Entries}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="File" Width="200" DisplayMemberBinding="{Binding Filename}"/>
+                    <GridViewColumn Header="Status" Width="80" DisplayMemberBinding="{Binding Status}"/>
+                    <GridViewColumn Header="Message" Width="300" DisplayMemberBinding="{Binding Message}"/>
+                </GridView>
+            </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Foreground" Value="{StaticResource ForegroundPrimary}"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="FontSize" Value="10"/>
+                    <Setter Property="Padding" Value="4,2"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{StaticResource ItemHover}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="{StaticResource ItemSelected}"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+    </Grid>
+</UserControl>

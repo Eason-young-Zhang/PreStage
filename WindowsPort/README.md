@@ -8,16 +8,21 @@ This folder is a dedicated handoff package for building a Windows x86 version of
 
 ## Recommended Reading Order
 
+0. Root repository docs:
+   - `../README.md`
+   - `../docs/build-and-release.md`
+   - `../docs/architecture.md`
+   - `../docs/roadmap.md`
 1. `PROJECT_BRIEF.md`
 2. `FEATURE_PARITY_CHECKLIST.md`
 3. `ARCHITECTURE_MAPPING.md`
 4. `UI_AND_INTERACTION_SPEC.md`
 5. `TEST_AND_ACCEPTANCE_PLAN.md`
 6. macOS source docs:
-   - `../README.md`
-   - `../docs/project_status.md`
-   - `../docs/architecture.md`
-   - `../docs/roadmap.md`
+   - `../PreStage-Mac/README.md`
+   - `../PreStage-Mac/docs/project_status.md`
+   - `../PreStage-Mac/docs/architecture.md`
+   - `../PreStage-Mac/docs/roadmap.md`
 
 ## Porting Principle
 
@@ -37,8 +42,8 @@ The Windows app should feel like a serious native photo workflow tool:
 
 Preferred options:
 
-- C# / .NET 8 or newer.
-- WinUI 3 or WPF depending on team experience.
+- C# / .NET 10 or newer.
+- WPF for the current Windows implementation.
 - Windows Imaging Component (WIC) for JPEG/PNG/TIFF/HEIF where available.
 - Microsoft Raw Image Extension or LibRaw for RAW support.
 - ExifTool, MetadataExtractor, or native metadata APIs for EXIF/XMP.
